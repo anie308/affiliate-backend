@@ -1,7 +1,7 @@
 const Coupon = require("../models/coupon.model");
 const { v4: uuidv4 } = require("uuid");
 const generateCode = async (req, res) => {
-  const { numberOfCodes } = req.body;
+  const { numberOfCodes, username } = req.body;
   try {
     const codes = [];
 
@@ -9,12 +9,15 @@ const generateCode = async (req, res) => {
       const code = uuidv4().substr(0, 8);
       const newCoupon = new Coupon({
         code,
-        used: false, // Set the initial status for each code
+        used: false, 
+        generatedFor: username// Set the initial status for each code
       });
       await newCoupon.save();
       codes.push({
         code,
         used: false,
+        generatedFor: username// Set the initial status for each code
+
       });
     }
 
