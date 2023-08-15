@@ -11,14 +11,16 @@ const createUser = async (req, res) => {
   try {
     const isAlreadyExists = await User.findOne({ email });
     const usernameInUse = await User.findOne({ username });
-    const couponStatus = await Coupon.findOne({code:couponcode});
+    const couponStatus = await Coupon.findOne({ code: couponcode });
 
     if (isAlreadyExists)
       return res.status(400).json({ error: "User already Exists" });
     if (usernameInUse)
       return res.status(400).json({ error: "Username already in use" });
     if (couponStatus.used === true)
-      return res.status(400).json({ error: "Coupon code has already been used" });
+      return res
+        .status(400)
+        .json({ error: "Coupon code has already been used" });
 
     const referralCode = uuidv4().substr(0, 8);
     const referralLink = `https://yourwebsite.com/signup?ref=${referralCode}`;
@@ -32,12 +34,10 @@ const createUser = async (req, res) => {
       password: cryptoJs.AES.encrypt(password, process.env.PASS_SEC),
     });
 
-
     if (ref) {
       const referredByUser = await User.findOne({ referralCode: ref });
       if (referredByUser) {
         newUser.referredBy = referredByUser._id;
-
         referredByUser.affiliatebalance += 3000;
         referredByUser.refCount += 1;
         await referredByUser.save();
@@ -47,7 +47,7 @@ const createUser = async (req, res) => {
     if (couponStatus) {
       const coupon = await Coupon.findOne({ code: couponcode });
       if (coupon) {
-        coupon.used = true; 
+        coupon.used = true;
         coupon.usedBy = newUser._id;
         await coupon.save();
       }
@@ -70,33 +70,57 @@ const createUser = async (req, res) => {
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
-  const isExistingUser = await User.findOne({ email });
-  !isExistingUser && res.status(401).json("Wrong Credentials!");
-  const hashedGuy = cryptoJs.AES.decrypt(
-    isExistingUser.password,
-    process.env.PASS_SEC
-  );
-  const decryptedPassword = hashedGuy.toString(cryptoJs.enc.Utf8);
+  try {
+    const isExistingUser = await User.findOne({ email });
 
-  if (decryptedPassword !== password) {
-    res.status(401).json("Wrong Credentials!");
-  } else {
-    const accessToken = jwt.sign(
-      {
-        id: isExistingUser._id,
-        role: isExistingUser.role,
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: "2d" }
+    if (!isExistingUser) {
+      return res.status(401).json("Wrong Credentials!");
+    }
+
+    const hashedGuy = cryptoJs.AES.decrypt(
+      isExistingUser.password,
+      process.env.PASS_SEC
     );
+    const decryptedPassword = hashedGuy.toString(cryptoJs.enc.Utf8);
 
-    const { password, ...others } = isExistingUser._doc;
+    if (decryptedPassword !== password) {
+      return res.status(401).json("Wrong Credentials!");
+    } else {
+      if (!isExistingUser.lastLogin) {
+        isExistingUser.lastLogin = new Date();
+        await isExistingUser.save();
+      }
+      // Calculate time difference since last login
+      const now = new Date();
+      const lastLogin = isExistingUser.lastLogin; // Assuming you have this field in your schema
+      const timeDifferenceInHours = Math.abs(now - lastLogin) / 36e5;
 
-    res.status(200).json({
-      status: "success",
-      message: "Logged in successfully!",
-      data: { ...others, accessToken },
-    });
+      // If 24 hours have passed since the last login, add 300 to activitybalance
+      if (timeDifferenceInHours >= 24) {
+        isExistingUser.activitybalance += 300;
+        isExistingUser.lastLogin = now;
+        await isExistingUser.save();
+      }
+
+      const accessToken = jwt.sign(
+        {
+          id: isExistingUser._id,
+          role: isExistingUser.role,
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: "1d" }
+      );
+
+      const { password, ...others } = isExistingUser._doc;
+
+      res.status(200).json({
+        status: "success",
+        message: "Logged in successfully!",
+        data: { ...others, accessToken },
+      });
+    }
+  } catch (err) {
+    res.status(500).json(err);
   }
 };
 
@@ -118,10 +142,86 @@ const getUser = async (req, res) => {
     res.status(200).json({
       user,
     });
-
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
+  }
+};
+
+const getUsers = async (req, res) => {
+  try {
+    const populateOptions = [
+      { path: "referredBy", select: "_id" }, // Select only the _id field of the referredBy user
+      "bankDetails",
+    ];
+    const users = await User.find({}).populate(populateOptions).sort({
+      createdAt: -1,
+    });
+
+    const userCount = await User.countDocuments();
+    res.status(200).json({
+      users,
+      userCount,
+    });
+  } catch (err) {
+    res.status(500).json(err);
+  }
+};
+
+const assignVendor = async (req, res) => {
+  const { username } = req.body;
+
+  try {
+    const user = await User.findOne({ username });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Update user's role to "vendor"
+    user.role = "vendor";
+    await user.save();
+
+    res.status(200).json({
+      message: "User role assigned as vendor",
+      user: {
+        _id: user._id,
+        fullname: user.fullname,
+        email: user.email,
+        role: user.role,
+      },
+    });
+  } catch (err) {
+    res.status(500).json(err);
+  }
+};
+
+const getReferrals = async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const referringUser = await User.findById(userId);
+
+    if (!referringUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Find users who were referred by the referring user
+    const referredUsers = await User.find(
+      { referredBy: referringUser._id },
+      { _id: 1, fullname: 1, email: 1 }
+    );
+
+    res.status(200).json({
+      referringUser: {
+        _id: referringUser._id,
+        fullname: referringUser.fullname,
+        // Include other user information if needed
+      },
+      referredUsers,
+    });
+  } catch (err) {
+    res.status(500).json(err);
   }
 };
 
@@ -129,4 +229,7 @@ module.exports = {
   createUser,
   loginUser,
   getUser,
+  getUsers,
+  assignVendor,
+  getReferrals,
 };

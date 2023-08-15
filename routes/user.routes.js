@@ -1,4 +1,4 @@
-const { createUser, getUser, loginUser } = require("../controllers/user.controllers");
+const { createUser, getUser, loginUser, getUsers, assignVendor, getReferrals } = require("../controllers/user.controllers");
 const {
   verifyToken,
   verifyTokenAndAuthorization,
@@ -22,6 +22,19 @@ router.get(
 router.post("/signin", 
 // loginValidator,
  loginUser);
+
+router.get("/", 
+// loginValidator,
+ getUsers
+ );
+router.post("/assign-vendor", 
+// loginValidator,
+assignVendor
+ );
+router.get("/referrals/:userId", 
+// loginValidator,
+getReferrals
+ );
 
 
 

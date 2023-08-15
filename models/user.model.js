@@ -57,13 +57,13 @@ const userSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    lastLogin: {
+      type: Date,
+    },
     role: { type: String, default: "user" },
   },
   { timestamps: true }
 );
 
 
-userSchema.virtual("totalbalance").get(function () {
-  return this.affiliatebalance + this.activitybalance;
-});
 module.exports = mongoose.model("User", userSchema);
