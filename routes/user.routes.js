@@ -1,4 +1,9 @@
-const { createUser, getUser, loginUser, getUsers, assignVendor, getReferrals } = require("../controllers/user.controllers");
+const {
+  createUser,
+  getUser,
+  loginUser,
+  getReferrals,
+} = require("../controllers/user.controllers");
 const {
   verifyToken,
   verifyTokenAndAuthorization,
@@ -8,34 +13,28 @@ const router = require("express").Router();
 
 router.post(
   "/register",
-//   verifyToken,
-//   verifyTokenAndAuthorization,
+  //   verifyToken,
+  //   verifyTokenAndAuthorization,
   createUser
 );
 router.get(
   "/:userId",
-//   verifyToken,
-//   verifyTokenAndAuthorization,
+  //   verifyToken,
+  //   verifyTokenAndAuthorization,
   getUser
 );
 
-router.post("/signin", 
-// loginValidator,
- loginUser);
+router.post(
+  "/signin",
+  // loginValidator,
+  loginUser
+);
 
-router.get("/", 
-// loginValidator,
- getUsers
- );
-router.post("/assign-vendor", 
-// loginValidator,
-assignVendor
- );
-router.get("/referrals/:userId", 
-// loginValidator,
-getReferrals
- );
-
+router.get(
+  "/referrals/:userId",
+  // loginValidator,
+  getReferrals
+);
 
 
 

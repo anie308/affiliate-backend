@@ -37,7 +37,7 @@ const userSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    refCount:{
+    refCount: {
       type: Number,
       default: 0,
     },
@@ -45,10 +45,7 @@ const userSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
-    bankDetails: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "BankDetails",
-    },
+
     affiliatebalance: {
       type: Number,
       default: 0,
@@ -57,6 +54,20 @@ const userSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+
+    accountnumber: {
+      type: String,
+      required: true,
+    },
+    accountname: {
+      type: String,
+      required: true,
+    },
+    bankname: {
+      type: String,
+      required: true,
+    },
+
     lastLogin: {
       type: Date,
     },
@@ -64,6 +75,5 @@ const userSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-
 
 module.exports = mongoose.model("User", userSchema);
