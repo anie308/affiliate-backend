@@ -96,6 +96,14 @@ const withdrawFunds = async (req, res) => {
   }
 };
 
+const getAllWithdrawals = async (req, res) => {
+  try {
+    const withdrawals = await WithdrawRequest.find({}).sort({ createdAt: -1 });
+    res.status(200).json(withdrawals);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+};
 
 const updateWithdrawalStatus = async (req, res) => {
   const { withdrawalId } = req.params;
@@ -139,7 +147,9 @@ const updateWithdrawalStatus = async (req, res) => {
 };
 
 
+
 module.exports = {
   withdrawFunds,
-  updateWithdrawalStatus
+  updateWithdrawalStatus,
+  getAllWithdrawals
 };

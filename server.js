@@ -13,6 +13,9 @@ const couponRoute = require('./routes/coupon.routes');
 const withdrawRoute = require('./routes/withdrawal.routes');
 const userRoute = require('./routes/user.routes');
 const notificationRoute = require('./routes/notification.routes');
+const vtuRoute = require('./routes/vtu.routes');
+const trendRoute = require('./routes/trend.routes');
+const vendorRoute = require('./routes/vendor.routes');
 
 app.use(cors({ origin: true}))
 app.use(bodyParser.json());
@@ -21,10 +24,13 @@ app.use(morgan('dev'));
 app.use(express.urlencoded({ extended: true }));
 
 
-app.use(`${apiSeedUrl}/coupon`, couponRoute);
-app.use(`${apiSeedUrl}/withdrawal`, withdrawRoute);
-app.use(`${apiSeedUrl}/user`, userRoute);
+app.use(`${apiSeedUrl}/coupons`, couponRoute);
+app.use(`${apiSeedUrl}/vendors`, vendorRoute);
+app.use(`${apiSeedUrl}/withdrawals`, withdrawRoute);
+app.use(`${apiSeedUrl}/users`, userRoute);
 app.use(`${apiSeedUrl}/admin`, adminRoute);
+app.use(`${apiSeedUrl}/vtu`, vtuRoute);
+app.use(`${apiSeedUrl}/trends`, trendRoute);
 app.use(`${apiSeedUrl}/notification`, notificationRoute);
 
 

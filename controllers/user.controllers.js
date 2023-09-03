@@ -24,7 +24,7 @@ const createUser = async (req, res) => {
         .json({ error: "Coupon code has already been used" });
 
     const referralCode = uuidv4().substr(0, 8);
-    const referralLink = `https://yourwebsite.com/signup?ref=${referralCode}`;
+    const referralLink = `https://lidenty.com/signup?ref=${referralCode}`;
     const newUser = new User({
       fullname,
       username,
@@ -115,6 +115,7 @@ const loginUser = async (req, res) => {
       const { password, ...others } = isExistingUser._doc;
 
       res.status(200).json({
+        statusCode: 200,
         status: "success",
         message: "Logged in successfully!",
         data: { ...others, accessToken },
@@ -128,7 +129,7 @@ const loginUser = async (req, res) => {
 const getUser = async (req, res) => {
   const { userId } = req.params;
   try {
-    const populateOptions = ["referredBy", "bankDetails"];
+    const populateOptions = ["referredBy"];
     if (!userId) {
       return res.status(401).json({ error: "Invalid request" });
     }
@@ -146,6 +147,25 @@ const getUser = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
+  }
+};
+
+const getUsers = async (req, res) => {
+  try {
+    const populateOptions = [
+      { path: "referredBy", select: "_id" }, // Select only the _id field of the referredBy user
+    ];
+    const users = await User.find({}).populate(populateOptions).sort({
+      createdAt: -1,
+    });
+
+    const userCount = await User.countDocuments();
+    res.status(200).json({
+      users,
+      userCount,
+    });
+  } catch (err) {
+    res.status(500).json(err);
   }
 };
 
@@ -178,11 +198,10 @@ const getReferrals = async (req, res) => {
   }
 };
 
-
-
 module.exports = {
   createUser,
   loginUser,
   getUser,
+  getUsers,
   getReferrals,
 };

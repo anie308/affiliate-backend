@@ -57,15 +57,12 @@ const userSchema = new mongoose.Schema(
 
     accountnumber: {
       type: String,
-      required: true,
     },
     accountname: {
       type: String,
-      required: true,
     },
     bankname: {
       type: String,
-      required: true,
     },
 
     lastLogin: {

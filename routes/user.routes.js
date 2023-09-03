@@ -3,39 +3,34 @@ const {
   getUser,
   loginUser,
   getReferrals,
+  getUsers,
 } = require("../controllers/user.controllers");
 const {
   verifyToken,
   verifyTokenAndAuthorization,
 } = require("../middlewares/verifyPerson");
+const { validateFields } = require("../middlewares/validateFields");
 
 const router = require("express").Router();
 
 router.post(
   "/register",
-  //   verifyToken,
-  //   verifyTokenAndAuthorization,
+  validateFields([
+    "couponcode",
+    "email",
+    "fullname",
+    "password",
+    "username",
+    "phonenumber",
+  ]),
   createUser
 );
-router.get(
-  "/:userId",
-  //   verifyToken,
-  //   verifyTokenAndAuthorization,
-  getUser
-);
+router.get("/:userId", verifyTokenAndAuthorization, getUser);
 
-router.post(
-  "/signin",
-  // loginValidator,
-  loginUser
-);
+router.post("/signin", validateFields(["email", "password"]), loginUser);
 
-router.get(
-  "/referrals/:userId",
-  // loginValidator,
-  getReferrals
-);
+router.get("/referrals/:userId", verifyToken, getReferrals);
 
-
+router.get("/users", verifyTokenAndAuthorization, getUsers);
 
 module.exports = router;

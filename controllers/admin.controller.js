@@ -1,54 +1,75 @@
 const User = require("../models/user.model");
+const Admin = require("../models/admin.model");
+const cryptoJs = require("crypto-js");
+const jwt = require("jsonwebtoken");
 
-const assignVendor = async (req, res) => {
-  const { username } = req.body;
-
+const createAdmin = async (req, res) => {
+  const { email, password, username } = req.body;
   try {
-    const user = await User.findOne({ username });
+    const newAdmin = new Admin({
+      username,
+      email,
+      password: cryptoJs.AES.encrypt(password, process.env.PASS_SEC),
+    });
 
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
+    await newAdmin.save();
 
-    // Update user's role to "vendor"
-    user.role = "vendor";
-    await user.save();
-
-    res.status(200).json({
-      message: "User role assigned as vendor",
-      user: {
-        _id: user._id,
-        fullname: user.fullname,
-        email: user.email,
-        role: user.role,
-      },
+    res.status(201).json({
+      message: "Registration successful",
+      statusCode: 200,
     });
   } catch (err) {
     res.status(500).json(err);
   }
 };
 
-const getUsers = async (req, res) => {
+const loginAdmin = async (req, res) => {
+  const { username, password } = req.body;
   try {
-    const populateOptions = [
-      { path: "referredBy", select: "_id" }, // Select only the _id field of the referredBy user
-      "bankDetails",
-    ];
-    const users = await User.find({}).populate(populateOptions).sort({
-      createdAt: -1,
-    });
+    const isExistingUser = await Admin.findOne({ username });
 
-    const userCount = await User.countDocuments();
-    res.status(200).json({
-      users,
-      userCount,
-    });
+    if (!isExistingUser) {
+      return res.status(401).json("Wrong Credentials!");
+    }
+
+    const hashedGuy = cryptoJs.AES.decrypt(
+      isExistingUser.password,
+      process.env.PASS_SEC
+    );
+    const decryptedPassword = hashedGuy.toString(cryptoJs.enc.Utf8);
+
+    if (decryptedPassword !== password) {
+      return res.status(401).json("Wrong Credentials!");
+    } else {
+      if (!isExistingUser.lastLogin) {
+        isExistingUser.lastLogin = new Date();
+        await isExistingUser.save();
+      }
+
+      const accessToken = jwt.sign(
+        {
+          id: isExistingUser._id,
+          role: isExistingUser.role,
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: "1d" }
+      );
+
+      const { password, ...others } = isExistingUser._doc;
+
+      res.status(200).json({
+        statusCode: 200,
+        status: "success",
+        message: "Logged in successfully!",
+        data: { ...others, accessToken },
+      });
+    }
   } catch (err) {
     res.status(500).json(err);
   }
 };
 
 module.exports = {
-  assignVendor,
-  getUsers,
+  createAdmin,
+  loginAdmin,
 };

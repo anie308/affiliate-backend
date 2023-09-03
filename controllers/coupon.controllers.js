@@ -2,13 +2,11 @@ const Coupon = require("../models/coupon.model");
 const User = require("../models/user.model");
 const { v4: uuidv4 } = require("uuid");
 
-
-
 const generateCode = async (req, res) => {
   const { numberOfCodes, username } = req.body;
   try {
     const user = await User.findOne({ username });
-    if (user.role !== 'vendor')
+    if (user.role !== "vendor")
       res.status(403).json({
         message: "User is not a vendor",
       });
@@ -57,15 +55,15 @@ const getCodes = async (req, res) => {
 const confirmCode = async (req, res) => {
   const { code } = req.body;
   try {
-    const coupon = Coupon.findOne({code});
-    if(coupon.used !== true) {
+    const coupon = Coupon.findOne({ code });
+    if (coupon.used !== true) {
       res.status(201).json({
-        message:'Coupon is still valid'
-      })
+        message: "Coupon is still valid",
+      });
     } else {
       res.status(201).json({
-        message:'Coupon has already been used'
-      })
+        message: "Coupon has already been used",
+      });
     }
   } catch (err) {
     console.log("error", err);
