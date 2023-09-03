@@ -74,7 +74,7 @@ const withdrawFunds = async (req, res) => {
 
     await user.save();
     const withdrawRequest = new WithdrawRequest({
-      userId :id,
+      userId: id,
       amount,
       category,
       bankname,
@@ -109,6 +109,7 @@ const updateWithdrawalStatus = async (req, res) => {
   const { withdrawalId } = req.params;
   const { status } = req.body;
 
+  console.log(withdrawalId, status);
   try {
     const withdrawRequest = await WithdrawRequest.findById(withdrawalId);
     if (!withdrawRequest) {
@@ -119,10 +120,13 @@ const updateWithdrawalStatus = async (req, res) => {
     withdrawRequest.status = status;
     await withdrawRequest.save();
 
-    if (status === "success") {
+    if (status === "approved") {
       // If the status is success, no further action needed
-      return res.status(200).json({ message: "Withdrawal status updated to success" });
-    } else if (status === "failed") {
+      return res.status(200).json({
+        statusCode: 200,
+        message: "Withdrawal Success!",
+      });
+    } else if (status === "declined") {
       // Refund money to the user's balance and update user document
       const user = await User.findById(withdrawRequest.userId);
       if (!user) {
@@ -137,19 +141,18 @@ const updateWithdrawalStatus = async (req, res) => {
 
       await user.save();
 
-      return res.status(200).json({ message: "Withdrawal status updated to failed, and money refunded to user's balance" });
+      return res.status(200).json({
+        statusCode: 200,
+        message: "Withdrawal declined!",
+      });
     }
-
-    res.status(400).json({ message: "Invalid status" });
   } catch (err) {
     res.status(500).json(err);
   }
 };
 
-
-
 module.exports = {
   withdrawFunds,
   updateWithdrawalStatus,
-  getAllWithdrawals
+  getAllWithdrawals,
 };
