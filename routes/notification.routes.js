@@ -1,6 +1,9 @@
 const {
   createNotification,
   getNotifications,
+  deleteNotification,
+  getNotification,
+  updateNotification,
 } = require("../controllers/notification.controllers");
 const {
   verifyToken,
@@ -16,6 +19,12 @@ router.post(
   verifyTokenAndAuthorization,
   createNotification
 );
-router.get("/", verifyToken, getNotifications);
+
+router.delete('/:notificationId', verifyTokenAndAuthorization, deleteNotification)
+
+
+router.get("/", getNotifications);
+router.get("/:notificationId", verifyTokenAndAuthorization, getNotification);
+router.put("/:notificationId", verifyTokenAndAuthorization, updateNotification);
 
 module.exports = router;

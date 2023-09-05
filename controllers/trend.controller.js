@@ -18,7 +18,7 @@ const createTrend = async (req, res) => {
     });
 
     if (file) {
-      console.log(file)
+      console.log(file);
       const { secure_url: url, public_id } = await cloudinary.uploader.upload(
         file.path
       );
@@ -39,22 +39,14 @@ const createTrend = async (req, res) => {
 
 const updateTrend = async (req, res) => {
   const { trendId } = req.params; // Assuming the trend ID is passed in the URL params
-  const { title, content, thumbnail } = req.body;
-  console.log(thumbnail.url)
-
-  
+  const { title, content } = req.body;
 
   try {
-
-
-
     const existingTrend = await Trend.findById(trendId);
 
     if (!existingTrend) {
       return res.status(404).json({ message: "Trend not found" });
     }
-
-
 
     if (title) {
       existingTrend.title = title;
@@ -62,22 +54,6 @@ const updateTrend = async (req, res) => {
     if (content) {
       existingTrend.content = content;
     }
-
-    // const public_id = existingTrend.thumbnail?.public_id;
-    // console.log(thumbnail)
-    // if (public_id && thumbnail) {
-    //   const { result } = await cloudinary.uploader.destroy(public_id);
-    //   if (result !== "ok")
-    //     return res.status(404).json({ error: "Could not remove thumbnail !" });
-    // }
-  
-    // if (thumbnail) {
-    //   const { secure_url: url, public_id } = await cloudinary.uploader.upload(
-    //     thumbnail.path
-    //   );
-    //   post.thumbnail = { url, public_id };
-    // }
-  
 
     await existingTrend.save();
 

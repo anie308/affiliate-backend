@@ -31,7 +31,7 @@ app.use(`${apiSeedUrl}/users`, userRoute);
 app.use(`${apiSeedUrl}/admin`, adminRoute);
 app.use(`${apiSeedUrl}/vtu`, vtuRoute);
 app.use(`${apiSeedUrl}/trends`, trendRoute);
-app.use(`${apiSeedUrl}/notification`, notificationRoute);
+app.use(`${apiSeedUrl}/notifications`, notificationRoute);
 
 
 app.listen(port, () => {
