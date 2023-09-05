@@ -17,11 +17,14 @@ const vtuRoute = require('./routes/vtu.routes');
 const trendRoute = require('./routes/trend.routes');
 const vendorRoute = require('./routes/vendor.routes');
 
-app.use(cors({ origin: true}))
-app.use(bodyParser.json());
+
+app.use(cors({origin: true}));
 app.use(express.json());
 app.use(morgan('dev'));
 app.use(express.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+
+
 
 
 app.use(`${apiSeedUrl}/coupons`, couponRoute);
