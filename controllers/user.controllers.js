@@ -43,6 +43,13 @@ const createUser = async (req, res) => {
         referredByUser.refCount += 1;
         await referredByUser.save();
       }
+      const indirectRef = referredByUser.referredBy;
+      const topChain = await User.findOne(indirectRef)
+      if(indirectRef && topChain){
+        topChain.affiliatebalance += 300;
+        topChain.indirectRefCount += 1;
+        await topChain.save();
+      }
     }
 
     if (couponStatus) {

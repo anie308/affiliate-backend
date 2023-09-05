@@ -41,6 +41,11 @@ const userSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    indirectRefCount: {
+      type: Number,
+      default: 0,
+    },
+
     referredBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -68,9 +73,8 @@ const userSchema = new mongoose.Schema(
     lastLogin: {
       type: Date,
     },
-    role: { type: String,
-      enum : ['user','vendor'],
-       default: "user" },
+    role: { type: String, default: "user" },
+    role2: { type: String, default: "" },
   },
   { timestamps: true }
 );
