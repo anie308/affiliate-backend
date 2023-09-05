@@ -1,5 +1,7 @@
 const WithdrawRequest = require("../models/withdrawalRequest.model");
 const User = require("../models/user.model");
+const { isValidObjectId } = require("mongoose");
+
 
 const withdrawFunds = async (req, res) => {
   const { userId } = req.params;
@@ -23,7 +25,9 @@ const withdrawFunds = async (req, res) => {
     if (!bankname || !accountnumber || !accountname) {
       return res
         .status(400)
-        .json({ message: "Please update your bank details" });
+        .json({
+          statusCode: 200,
+          message: "Please update your bank details" });
     }
 
     if (category === "activity") {
@@ -105,6 +109,23 @@ const getAllWithdrawals = async (req, res) => {
   }
 };
 
+const getUserWithdrawals = async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    if (!isValidObjectId(userId))
+    return res.status(401).json({ error: "Invalid request" });
+
+    const withdrawals = await WithdrawRequest.find({ userId }).sort({
+      createdAt: -1,
+    });
+    res.status(200).json(withdrawals);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+};
+
+
 const updateWithdrawalStatus = async (req, res) => {
   const { withdrawalId } = req.params;
   const { status } = req.body;
@@ -155,4 +176,5 @@ module.exports = {
   withdrawFunds,
   updateWithdrawalStatus,
   getAllWithdrawals,
+  getUserWithdrawals,
 };
