@@ -25,7 +25,7 @@ router.post(
   ]),
   createUser
 );
-router.get("/:userId", verifyTokenAndAuthorization, getUser);
+router.get("/:userId",  getUser);
 
 router.post("/signin", validateFields(["email", "password"]), loginUser);
 

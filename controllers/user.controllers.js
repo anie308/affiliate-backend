@@ -148,7 +148,8 @@ const getUser = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    res.status(200).json({
+    res.status(201).json({
+      statusCode: 200,
       user,
     });
   } catch (err) {
@@ -204,6 +205,31 @@ const getReferrals = async (req, res) => {
     res.status(500).json(err);
   }
 };
+
+const dashStats = async (req, res) => {
+  const { userId } = req.params;
+  try{
+    const user = await User.findById(userId);
+    if(!user){
+      return res.status(404).json({message: "User not found"});
+    }
+    const referredUsers = await User.find({referredBy: user._id});
+    const referredUsersCount = referredUsers.length;
+    const indirectReferredUsers = user.indirectRefCount;
+    const totalReferrals = indirectRefCount + refCount;
+    const totalEarnings = user.affiliatebalance + user.activitybalance;
+
+    res.status(200).json({
+      totalReferrals,
+      totalEarnings,
+      referredUsersCount,
+      indirectReferredUsers
+    })
+
+  }catch(err){
+    res.status(500).json(err);
+  }
+}
 
 module.exports = {
   createUser,

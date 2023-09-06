@@ -14,6 +14,12 @@ const trendSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    whatsappLink:{
+      type: String,
+    },
+    facebookLink:{
+      type: String,
+    },
     thumbnail: {
         type: Object,
         url: {

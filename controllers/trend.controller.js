@@ -1,9 +1,10 @@
 const Trend = require("../models/trend.model");
+const User = require("../models/user.model");
 const cloudinary = require("../cloud");
 const { isValidObjectId } = require("mongoose");
 
 const createTrend = async (req, res) => {
-  const { title, content, slug } = req.body;
+  const { title, content, slug, whatsappLink, facebookLink } = req.body;
   const { file } = req;
 
   const alreadyExists = await Trend.findOne({ title });
@@ -15,6 +16,8 @@ const createTrend = async (req, res) => {
       title,
       content,
       slug,
+      whatsappLink,
+       facebookLink 
     });
 
     if (file) {
@@ -39,7 +42,7 @@ const createTrend = async (req, res) => {
 
 const updateTrend = async (req, res) => {
   const { trendId } = req.params; // Assuming the trend ID is passed in the URL params
-  const { title, content } = req.body;
+  const { title, content, whatsappLink, facebookLink  } = req.body;
 
   try {
     const existingTrend = await Trend.findById(trendId);
@@ -126,6 +129,25 @@ const getTrends = async (req, res) => {
     res.status(500).json(err);
   }
 };
+
+const completeTrend = async (req, res) => {
+  const { trendId } = req.params;
+  const {userId} = req.body;
+
+  try{
+    const trend = await Trend.findById(trendId);
+    const user = await User.findById(userId);
+    if(!trend){
+      return res.status(404).json({message: "Trend not found"});
+    }
+
+    
+
+
+  } catch (err) {
+    res.status(500).json(err);
+  }
+}
 
 module.exports = {
   createTrend,

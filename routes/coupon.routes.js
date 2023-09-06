@@ -9,11 +9,11 @@ const router = require("express").Router();
 router.post(
   "/generate-coupon",
 //   verifyToken,
-//   verifyTokenAndAuthorization,
+  verifyTokenAndAuthorization,
   generateCode
 );
 router.get(
-  "/all",
+  "/:vendorId",
 //   verifyToken,
 //   verifyTokenAndAuthorization,
   getCodes

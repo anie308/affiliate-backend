@@ -6,46 +6,74 @@ const generateCode = async (req, res) => {
   const { numberOfCodes, username } = req.body;
   try {
     const user = await User.findOne({ username });
-    if (user.role !== "vendor")
+
+    if (user.role2 !== "vendor") {
       res.status(403).json({
         message: "User is not a vendor",
       });
+    } else {
+      const codes = [];
+      const userId = user._id;
 
-    const codes = [];
+      for (let i = 0; i < numberOfCodes; i++) {
+        const code = uuidv4().substr(0, 8);
+        const newCoupon = new Coupon({
+          code,
+          used: false,
+          generatedFor: userId, // Set the initial status for each code
+        });
+        await newCoupon.save();
+        codes.push({
+          code,
+          used: false,
+          generatedFor: username, // Set the initial status for each code
+        });
+      }
 
-    for (let i = 0; i < numberOfCodes; i++) {
-      const code = uuidv4().substr(0, 8);
-      const newCoupon = new Coupon({
-        code,
-        used: false,
-        generatedFor: username, // Set the initial status for each code
-      });
-      await newCoupon.save();
-      codes.push({
-        code,
-        used: false,
-        generatedFor: username, // Set the initial status for each code
+      res.status(200).json({
+        codes,
       });
     }
-
-    res.status(200).json({
-      codes,
-    });
   } catch (err) {
     res.status(500).json(err);
   }
 };
 
 const getCodes = async (req, res) => {
+  const { vendorId } = req.params;
   try {
-    const codeCount = await Coupon.countDocuments();
-    const allCodes = await Coupon.find({}).sort({
+    const personalisedCodes = await Coupon.find({
+      generatedFor: vendorId,
+    }).sort({
       createdAt: -1,
     });
+    const codeCount = await Coupon.find({
+      generatedFor: vendorId,
+    }).sort({
+      createdAt: -1,
+    }).countDocuments();
+
+    const usedCodes = await Coupon.find({
+      generatedFor: vendorId,
+      used: true,
+    }).sort({
+      createdAt: -1,
+    }).countDocuments();
+    const unusedCodes = await Coupon.find({
+      generatedFor: vendorId,
+      used: false,
+    }).sort({
+      createdAt: -1,
+    }).countDocuments();
+    
+   
 
     res.status(200).json({
-      allCodes,
+      statusCode: 200,
+      personalisedCodes,
       codeCount,
+      usedCodes,
+      unusedCodes
     });
   } catch (err) {
     res.status(500).json(err);

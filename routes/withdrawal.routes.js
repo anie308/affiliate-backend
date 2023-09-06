@@ -8,7 +8,7 @@ const { withdrawFunds, updateWithdrawalStatus, getAllWithdrawals, getUserWithdra
 
 
 router.post(
-    "/new/:userId",
+    "/new",
     verifyToken,
     withdrawFunds
   );

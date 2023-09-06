@@ -2,10 +2,8 @@ const WithdrawRequest = require("../models/withdrawalRequest.model");
 const User = require("../models/user.model");
 const { isValidObjectId } = require("mongoose");
 
-
 const withdrawFunds = async (req, res) => {
-  const { userId } = req.params;
-  const { amount, category } = req.body;
+  const { amount, category, userId } = req.body;
 
   try {
     const user = await User.findById(userId);
@@ -23,34 +21,38 @@ const withdrawFunds = async (req, res) => {
       accountname,
     } = user;
     if (!bankname || !accountnumber || !accountname) {
-      return res
-        .status(400)
-        .json({
-          statusCode: 200,
-          message: "Please update your bank details" });
+      return res.status(400).json({
+        statusCode: 200,
+        message: "Please update your bank details",
+      });
     }
 
     if (category === "activity") {
       const today = new Date();
       const dayOfMonth = today.getDate();
 
-      if (dayOfMonth !== 20) {
-        return res.status(400).json({
-          message:
-            "Withdrawals are only allowed on the 20th day of the month for the 'activity' category",
-        });
-      }
+      // if (dayOfMonth !== 20) {
+      //   return res.status(201).json({
+      //     statusCode: 400,
+      //     message:
+      //       "Withdrawals are only allowed on the 20th day of the month for the 'activity' category",
+      //   });
+      // }
 
-      if (amount < 16000) {
-        return res.status(400).json({
+      if (parseInt(amount) < 16000) {
+        return res.status(201).json({
+          statusCode: 400,
           message: "Minimum withdrawal amount for 'activity' category is 16000",
         });
       }
 
-      if (activitybalance < amount) {
-        return res.status(400).json({ message: "Insufficient funds" });
+      if (activitybalance < parseInt(amount)) {
+        return res.status(201).json({
+          statusCode: 400,
+          message: "Insufficient funds",
+        });
       } else {
-        user.activitybalance -= amount;
+        user.activitybalance -= parseInt(amount);
       }
     } else if (category === "affiliate") {
       const today = new Date();
@@ -58,22 +60,27 @@ const withdrawFunds = async (req, res) => {
 
       if (dayOfWeek !== 1 && dayOfWeek !== 5) {
         // 1 represents Monday, 5 represents Friday
-        return res.status(400).json({
+        return res.status(201).json({
+          statusCode: 400,
           message:
             "Withdrawals are only allowed on Mondays and Fridays of the week for the 'affiliate' category",
         });
       }
 
       if (amount < 6000) {
-        return res.status(400).json({
+        return res.status(201).json({
+          statusCode: 400,
           message: "Minimum withdrawal amount for 'affiliate' category is 6000",
         });
       }
 
       if (affiliatebalance < amount) {
-        return res.status(400).json({ message: "Insufficient funds" });
+        return res.status(201).json({
+          statusCode: 400,
+          message: "Insufficient funds",
+        });
       }
-      user.affiliatebalance -= amount;
+      user.affiliatebalance -= parseInt(amount);
     }
 
     await user.save();
@@ -88,6 +95,7 @@ const withdrawFunds = async (req, res) => {
     });
     await withdrawRequest.save();
     res.status(201).json({
+      statusCode: 201,
       message: "Withdrawal request sent successfully",
       data: {
         amount: withdrawRequest.amount,
@@ -114,7 +122,7 @@ const getUserWithdrawals = async (req, res) => {
 
   try {
     if (!isValidObjectId(userId))
-    return res.status(401).json({ error: "Invalid request" });
+      return res.status(401).json({ error: "Invalid request" });
 
     const withdrawals = await WithdrawRequest.find({ userId }).sort({
       createdAt: -1,
@@ -124,7 +132,6 @@ const getUserWithdrawals = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 
 const updateWithdrawalStatus = async (req, res) => {
   const { withdrawalId } = req.params;
