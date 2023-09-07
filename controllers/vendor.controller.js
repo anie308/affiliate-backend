@@ -10,11 +10,11 @@ const assignVendor = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    if (user.role === "superuser") {
+    if (user.role2 === "superuser") {
       return res.status(404).json({ message: "User is already a vendor" });
     }
     // Update user's role to "vendor"
-    user.role = "superuser";
+    user.role2 = "superuser";
     await user.save();
 
     res.status(200).json({
@@ -42,11 +42,11 @@ const removeVendor = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    if (user.role2 !== "vendor") {
+    if (user.role2 !== "superuser") {
       return res.status(404).json({ message: "User is not a vendor" });
     }
     // Update user's role to "vendor"
-    user.role2 = "vendor";
+    user.role2 = "";
     await user.save();
 
     res.status(200).json({
@@ -66,7 +66,7 @@ const removeVendor = async (req, res) => {
 
 const getVendors = async (req, res) => {
   try {
-    const vendors = await User.find({ role2: "vendor" }).select(
+    const vendors = await User.find({ role2: "superuser" }).select(
       "id username email"
     );
     res.status(200).json(vendors);
