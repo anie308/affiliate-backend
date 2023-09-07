@@ -67,7 +67,7 @@ const removeVendor = async (req, res) => {
 const getVendors = async (req, res) => {
   try {
     const vendors = await User.find({ role2: "superuser" }).select(
-      "id username email"
+      "id username email phonenumber bankname fullname"
     );
     res.status(200).json(vendors);
   } catch (err) {
