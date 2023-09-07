@@ -18,7 +18,7 @@ router.post(
   );
 
   router.get(
-    "/:username",
+    "/",
     verifyTokenAndAuthorization,
     getVendors
   );
