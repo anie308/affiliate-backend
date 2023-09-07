@@ -4,7 +4,8 @@ const {
   loginUser,
   getReferrals,
   getUsers,
-  updateUser
+  updateUser,
+  dashStats
 } = require("../controllers/user.controllers");
 const {
   verifyToken,
@@ -27,6 +28,7 @@ router.post(
   createUser
 );
 router.get("/:userId",  getUser);
+router.get("/stats/:userId",  dashStats);
 router.put("/:userId", verifyToken,  updateUser);
 
 router.post("/signin", validateFields(["email", "password"]), loginUser);

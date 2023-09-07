@@ -2,6 +2,7 @@ const cryptoJs = require("crypto-js");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user.model");
 const Coupon = require("../models/coupon.model");
+const Withdrawal = require("../models/withdrawalRequest.model");
 
 const { v4: uuidv4 } = require("uuid");
 
@@ -252,16 +253,44 @@ const dashStats = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
     const referredUsers = await User.find({ referredBy: user._id });
-    const referredUsersCount = referredUsers.length;
+    const directReferrals = referredUsers.length;
     const indirectReferredUsers = user.indirectRefCount;
-    const totalReferrals = indirectRefCount + refCount;
+    const totalReferrals = user.indirectRefCount + user.refCount;
     const totalEarnings = user.affiliatebalance + user.activitybalance;
 
+    // const totalCashout = await Withdrawal.find({
+    //   userId : userId,
+    //   status: 'approved'
+    // })
+
+    const totalCashout = await Withdrawal.aggregate([
+      {
+        $match: {
+          userId: userId,
+          status: 'approved'
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          totalAmount: { $sum: '$amount' }
+        }
+      }
+    ]);
+
+    let totalCashedAmount = 0;
+    if (totalCashout.length > 0) {
+      totalCashedAmount = totalCashout[0].totalAmount;
+    }
+
+
     res.status(200).json({
-      totalReferrals,
-      totalEarnings,
-      referredUsersCount,
+      statusCode: 200,
+      totalCashedAmount,
+      directReferrals,
       indirectReferredUsers,
+      totalReferrals,
+      totalEarnings
     });
   } catch (err) {
     res.status(500).json(err);
@@ -274,5 +303,6 @@ module.exports = {
   getUser,
   getUsers,
   getReferrals,
-  updateUser
+  updateUser,
+  dashStats
 };
