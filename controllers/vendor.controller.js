@@ -69,7 +69,11 @@ const getVendors = async (req, res) => {
     const vendors = await User.find({ role2: "superuser" }).select(
       "id username email phonenumber bankname fullname profileImage"
     );
-    res.status(200).json(vendors);
+    shuffleArray(vendors);
+    res.status(200).json({
+      statusCode: 200,
+      vendors,
+    });
   } catch (err) {
     res.status(500).json(err);
   }
@@ -80,3 +84,10 @@ module.exports = {
   getVendors,
   removeVendor,
 };
+
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
