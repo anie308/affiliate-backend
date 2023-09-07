@@ -23,7 +23,7 @@ const createUser = async (req, res) => {
         .status(400)
         .json({ error: "Coupon code has already been used" });
 
-    const referralCode = uuidv4().substr(0, 8);
+    const referralCode = username+uuidv4().substr(0, 3);
     const referralLink = `https://lidenty.com/signup?ref=${referralCode}`;
     const newUser = new User({
       fullname,
@@ -75,40 +75,39 @@ const createUser = async (req, res) => {
 };
 const updateUser = async (req, res) => {
   const { userId } = req.params; 
-  console.log(userId)// Assuming you pass the user ID as a URL parameter
-  const updateData = req.body; // The data to update, sent in the request body
+  const updateData = req.body;
 
   try {
     // Check if the user exists
-    // const user = await User.findById(userId);
+    const user = await User.findById(userId);
 
-    // if (!user) {
-    //   return res.status(404).json({ error: "User not found" });
-    // }
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
 
-    // // Update user data based on the fields provided in the request body
-    // if (updateData.fullname) {
-    //   user.fullname = updateData.fullname;
-    // }
-    // if (updateData.accountnumber) {
-    //   user.accountnumber = updateData.accountnumber;
-    // }
-    // if (updateData.accountname) {
-    //   user.accountname = updateData.accountname;
-    // }
-    // if (updateData.bankname) {
-    //   user.bankname = updateData.bankname;
-    // }
+    // Update user data based on the fields provided in the request body
+    if (updateData.fullname) {
+      user.fullname = updateData.fullname;
+    }
+    if (updateData.accountnumber) {
+      user.accountnumber = updateData.accountnumber;
+    }
+    if (updateData.accountname) {
+      user.accountname = updateData.accountname;
+    }
+    if (updateData.bankname) {
+      user.bankname = updateData.bankname;
+    }
 
-    // // You can add additional fields to update here if needed
+    // You can add additional fields to update here if needed
 
-    // // Save the updated user data
-    // await user.save();
+    // Save the updated user data
+    await user.save();
 
-    // res.status(200).json({
-    //   message: "User updated successfully",
-    //   statusCode: 200,
-    // });
+    res.status(200).json({
+      message: "User updated successfully",
+      statusCode: 200,
+    });
   } catch (err) {
     res.status(500).json(err);
   }
