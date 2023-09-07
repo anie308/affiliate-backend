@@ -77,6 +77,8 @@ const createUser = async (req, res) => {
 const updateUser = async (req, res) => {
   const { userId } = req.params; 
   const updateData = req.body;
+  const { file } = req;
+
 
   try {
     // Check if the user exists
@@ -99,6 +101,15 @@ const updateUser = async (req, res) => {
     if (updateData.bankname) {
       user.bankname = updateData.bankname;
     }
+
+    // if (file) {
+    //   console.log(file);
+    //   const { secure_url: url, public_id } = await cloudinary.uploader.upload(
+    //     file.path
+    //   );
+    //   user.profileImage = { url, public_id };
+    //   // newLesson.lessons.lesson_video = { url, public_id };
+    // }
 
     // You can add additional fields to update here if needed
 
