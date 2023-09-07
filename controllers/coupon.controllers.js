@@ -7,7 +7,7 @@ const generateCode = async (req, res) => {
   try {
     const user = await User.findOne({ username });
 
-    if (user.role2 !== "vendor") {
+    if (user.role2 !== "superuser") {
       res.status(403).json({
         message: "User is not a vendor",
       });
