@@ -44,8 +44,8 @@ const createUser = async (req, res) => {
         await referredByUser.save();
       }
       const indirectRef = referredByUser.referredBy;
-      const topChain = await User.findOne(indirectRef)
-      if(indirectRef && topChain){
+      const topChain = await User.findOne(indirectRef);
+      if (indirectRef && topChain) {
         topChain.affiliatebalance += 300;
         topChain.indirectRefCount += 1;
         await topChain.save();
@@ -68,6 +68,45 @@ const createUser = async (req, res) => {
     res.status(201).json({
       message: "Registration successful",
       statusCode: 201,
+    });
+  } catch (err) {
+    res.status(500).json(err);
+  }
+};
+const updateUser = async (req, res) => {
+  const { userId } = req.params; // Assuming you pass the user ID as a URL parameter
+  const updateData = req.body; // The data to update, sent in the request body
+
+  try {
+    // Check if the user exists
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Update user data based on the fields provided in the request body
+    if (updateData.fullname) {
+      user.fullname = updateData.fullname;
+    }
+    if (updateData.accountnumber) {
+      user.accountnumber = updateData.accountnumber;
+    }
+    if (updateData.accountname) {
+      user.accountname = updateData.accountname;
+    }
+    if (updateData.bankname) {
+      user.bankname = updateData.bankname;
+    }
+
+    // You can add additional fields to update here if needed
+
+    // Save the updated user data
+    await user.save();
+
+    res.status(200).json({
+      message: "User updated successfully",
+      statusCode: 200,
     });
   } catch (err) {
     res.status(500).json(err);
@@ -207,12 +246,12 @@ const getReferrals = async (req, res) => {
 
 const dashStats = async (req, res) => {
   const { userId } = req.params;
-  try{
+  try {
     const user = await User.findById(userId);
-    if(!user){
-      return res.status(404).json({message: "User not found"});
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
     }
-    const referredUsers = await User.find({referredBy: user._id});
+    const referredUsers = await User.find({ referredBy: user._id });
     const referredUsersCount = referredUsers.length;
     const indirectReferredUsers = user.indirectRefCount;
     const totalReferrals = indirectRefCount + refCount;
@@ -222,13 +261,12 @@ const dashStats = async (req, res) => {
       totalReferrals,
       totalEarnings,
       referredUsersCount,
-      indirectReferredUsers
-    })
-
-  }catch(err){
+      indirectReferredUsers,
+    });
+  } catch (err) {
     res.status(500).json(err);
   }
-}
+};
 
 module.exports = {
   createUser,
@@ -236,4 +274,5 @@ module.exports = {
   getUser,
   getUsers,
   getReferrals,
+  updateUser
 };
