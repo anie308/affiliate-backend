@@ -7,7 +7,7 @@ const {
 const router = require("express").Router();
 
 router.post(
-  "/generate-coupon",
+  "/generate",
 //   verifyToken,
   verifyTokenAndAuthorization,
   generateCode

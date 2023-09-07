@@ -7,7 +7,11 @@ const generateCode = async (req, res) => {
   try {
     const user = await User.findOne({ username });
 
-    if (user.role2 !== "superuser") {
+    if (!user) {
+      res.status(403).json({
+        message: "User not Found",
+      });
+    } else if (user.role2 !== "superuser") {
       res.status(403).json({
         message: "User is not a vendor",
       });
@@ -31,6 +35,8 @@ const generateCode = async (req, res) => {
       }
 
       res.status(200).json({
+        message: "Codes Generated Successfully",
+        statusCode: 200,
         codes,
       });
     }
@@ -49,31 +55,35 @@ const getCodes = async (req, res) => {
     });
     const codeCount = await Coupon.find({
       generatedFor: vendorId,
-    }).sort({
-      createdAt: -1,
-    }).countDocuments();
+    })
+      .sort({
+        createdAt: -1,
+      })
+      .countDocuments();
 
     const usedCodes = await Coupon.find({
       generatedFor: vendorId,
       used: true,
-    }).sort({
-      createdAt: -1,
-    }).countDocuments();
+    })
+      .sort({
+        createdAt: -1,
+      })
+      .countDocuments();
     const unusedCodes = await Coupon.find({
       generatedFor: vendorId,
       used: false,
-    }).sort({
-      createdAt: -1,
-    }).countDocuments();
-    
-   
+    })
+      .sort({
+        createdAt: -1,
+      })
+      .countDocuments();
 
     res.status(200).json({
       statusCode: 200,
       personalisedCodes,
       codeCount,
       usedCodes,
-      unusedCodes
+      unusedCodes,
     });
   } catch (err) {
     res.status(500).json(err);
