@@ -308,6 +308,21 @@ const dashStats = async (req, res) => {
   }
 };
 
+const getTopEarners = async (req, res) => {
+  try {
+    const users = await User.find()
+      .select("id username  fullname  affiliatebalance")
+      .sort({ affiliatebalance: -1 }).limit(10);; // Sort by affiliatebalance in descending order
+
+    res.status(200).json({
+      statusCode: 200,
+      users,
+    });
+  } catch (err) {
+    res.status(500).json(err);
+  }
+};
+
 module.exports = {
   createUser,
   loginUser,
@@ -315,5 +330,6 @@ module.exports = {
   getUsers,
   getReferrals,
   updateUser,
-  dashStats
+  dashStats,
+  getTopEarners
 };
