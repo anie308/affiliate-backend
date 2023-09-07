@@ -67,8 +67,7 @@ const createUser = async (req, res) => {
 
     res.status(201).json({
       message: "Registration successful",
-      status: "success",
-      referralLink,
+      statusCode: 201,
     });
   } catch (err) {
     res.status(500).json(err);
