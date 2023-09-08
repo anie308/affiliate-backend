@@ -44,7 +44,7 @@ const withdrawFunds = async (req, res) => {
       if (currentHour < 17 || currentHour >= 18) {
         return res.status(201).json({
           statusCode: 400,
-          message: "Withdrawals for 'activity' category are only allowed between 5-6pm on the 20th day of the month",
+          message: "Withdrawal Portal Closed",
         });
       }
 
@@ -82,7 +82,7 @@ const withdrawFunds = async (req, res) => {
       if (currentHour < 17 || currentHour >= 18) {
         return res.status(201).json({
           statusCode: 400,
-          message: "Withdrawals for 'affiliate' category are only allowed between 5-6pm on  Mondays and Fridays",
+          message: "Withdrawal Portal Closed",
         });
       }
 
