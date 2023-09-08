@@ -40,13 +40,15 @@ const withdrawFunds = async (req, res) => {
         });
       }
 
-      const currentHour = today.getHours();
-      if (currentHour < 17 || currentHour >= 18) {
-        return res.status(201).json({
-          statusCode: 400,
-          message: "Withdrawal Portal Closed",
-        });
-      }
+
+      // const currentHour = today.getHours();
+      // console.log('Current Hour:', currentHour);
+      // if (currentHour < 17 || currentHour >= 18) {
+      //   return res.status(201).json({
+      //     statusCode: 400,
+      //     message: "Withdrawal Portal Closed",
+      //   });
+      // }
 
       if (parseInt(amount) < 16000) {
         return res.status(201).json({
