@@ -8,7 +8,7 @@ const createTrend = async (req, res) => {
   const { title, content, slug, taskText } = req.body;
   const { file } = req;
 
-  const alreadyExists = await Trend.findOne({ title });
+  const alreadyExists = await Trend.findOne({ slug });
 
   try {
     if (alreadyExists)
@@ -42,7 +42,7 @@ const createTrend = async (req, res) => {
 
 const updateTrend = async (req, res) => {
   const { trendId } = req.params; // Assuming the trend ID is passed in the URL params
-  const { title, content, taskText, slug } = req.body;
+  const { title, content, taskText } = req.body;
 
   try {
     const existingTrend = await Trend.findById(trendId);
