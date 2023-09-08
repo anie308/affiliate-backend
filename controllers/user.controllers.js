@@ -92,6 +92,9 @@ const updateUser = async (req, res) => {
     if (updateData.fullname) {
       user.fullname = updateData.fullname;
     }
+    if (updateData.phonenumber) {
+      user.phonenumber = updateData.phonenumber;
+    }
     if (updateData.accountnumber) {
       user.accountnumber = updateData.accountnumber;
     }

@@ -5,9 +5,10 @@ const {
   updateTrend,
   getTrends,
   deleteTrend,
-  getTrend
+  getTrend,
+  completeTrend
 } = require("../controllers/trend.controller");
-const { verifyTokenAndAuthorization } = require("../middlewares/verifyPerson");
+const { verifyTokenAndAuthorization, verifyToken } = require("../middlewares/verifyPerson");
 
 router.post(
   "/create",
@@ -15,6 +16,13 @@ router.post(
   verifyTokenAndAuthorization,
   createTrend
 );
+router.post(
+  "/complete",
+  verifyToken,
+  completeTrend
+);
+
+
 router.put("/:trendId",  verifyTokenAndAuthorization, updateTrend);
 router.get("/:trendId", verifyTokenAndAuthorization, getTrend);
 router.get("/", getTrends);

@@ -2,6 +2,7 @@ const Trend = require("../models/trend.model");
 const User = require("../models/user.model");
 const cloudinary = require("../cloud");
 const { isValidObjectId } = require("mongoose");
+const cron = require("node-cron");
 
 const createTrend = async (req, res) => {
   const { title, content, slug, whatsappLink, facebookLink } = req.body;
@@ -17,7 +18,7 @@ const createTrend = async (req, res) => {
       content,
       slug,
       whatsappLink,
-       facebookLink 
+      facebookLink,
     });
 
     if (file) {
@@ -42,7 +43,7 @@ const createTrend = async (req, res) => {
 
 const updateTrend = async (req, res) => {
   const { trendId } = req.params; // Assuming the trend ID is passed in the URL params
-  const { title, content, whatsappLink, facebookLink  } = req.body;
+  const { title, content, whatsappLink, facebookLink } = req.body;
 
   try {
     const existingTrend = await Trend.findById(trendId);
@@ -132,22 +133,48 @@ const getTrends = async (req, res) => {
 
 const completeTrend = async (req, res) => {
   const { trendId } = req.params;
-  const {userId} = req.body;
+  const { userId } = req.body;
 
-  try{
+  try {
     const trend = await Trend.findById(trendId);
     const user = await User.findById(userId);
-    if(!trend){
-      return res.status(404).json({message: "Trend not found"});
+    if (!trend) {
+      return res.status(404).json({
+        statusCode: 200,
+        message: "Trend not found",
+      });
     }
-
-    
-
-
+    if (!user) {
+      return res.status(404).json({
+        statusCode: 200,
+        message: "User not found",
+      });
+    }
+    if (user.hasDoneTaskForToday) {
+      return res.status(400).json({
+        statusCode: 200,
+        message: "You have already completed a task today",
+      });
+    }
+    user.hasDoneTaskForToday = true;
+    user.activitybalance += 200;
+    await user.save();
   } catch (err) {
     res.status(500).json(err);
   }
-}
+};
+
+
+cron.schedule('0 0 * * *', async () => {
+  try {
+    // Update all users to set hasDoneTaskForToday to false
+    await User.updateMany({}, { $set: { hasDoneTaskForToday: false } });
+
+    console.log('Daily task reset completed.');
+  } catch (err) {
+    console.error('Error resetting daily tasks:', err);
+  }
+});
 
 module.exports = {
   createTrend,
@@ -155,4 +182,5 @@ module.exports = {
   deleteTrend,
   updateTrend,
   getTrend,
+  completeTrend
 };

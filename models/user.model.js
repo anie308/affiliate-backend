@@ -78,6 +78,10 @@ const userSchema = new mongoose.Schema(
     bankname: {
       type: String,
     },
+    hasDoneTaskForToday: {
+      type: Boolean,
+      default: false,
+    },
 
     lastLogin: {
       type: Date,
