@@ -1,5 +1,6 @@
 const WithdrawRequest = require("../models/withdrawalRequest.model");
 const User = require("../models/user.model");
+const Admin = require("../models/admin.model");
 const { isValidObjectId } = require("mongoose");
 
 const withdrawFunds = async (req, res) => {
@@ -31,13 +32,21 @@ const withdrawFunds = async (req, res) => {
       const today = new Date();
       const dayOfMonth = today.getDate();
 
-      // if (dayOfMonth !== 20) {
-      //   return res.status(201).json({
-      //     statusCode: 400,
-      //     message:
-      //       "Withdrawals are only allowed on the 20th day of the month for the 'activity' category",
-      //   });
-      // }
+      if (dayOfMonth !== 20) {
+        return res.status(201).json({
+          statusCode: 400,
+          message:
+            "Withdrawals are only allowed on the 20th day of the month for the 'activity' category",
+        });
+      }
+
+      const currentHour = today.getHours();
+      if (currentHour < 17 || currentHour >= 18) {
+        return res.status(201).json({
+          statusCode: 400,
+          message: "Withdrawals for 'activity' category are only allowed between 5-6pm on the 20th day of the month",
+        });
+      }
 
       if (parseInt(amount) < 16000) {
         return res.status(201).json({
@@ -45,6 +54,8 @@ const withdrawFunds = async (req, res) => {
           message: "Minimum withdrawal amount for 'activity' category is 16000",
         });
       }
+
+      
 
       if (activitybalance < parseInt(amount)) {
         return res.status(201).json({
@@ -64,6 +75,14 @@ const withdrawFunds = async (req, res) => {
           statusCode: 400,
           message:
             "Withdrawals are only allowed on Mondays and Fridays of the week for the 'affiliate' category",
+        });
+      }
+
+      const currentHour = today.getHours();
+      if (currentHour < 17 || currentHour >= 18) {
+        return res.status(201).json({
+          statusCode: 400,
+          message: "Withdrawals for 'affiliate' category are only allowed between 5-6pm on the 20th day of the month",
         });
       }
 
