@@ -64,7 +64,10 @@ const deleteNotification = async (req, res) => {
 const getNotifications = async (req, res) => {
   try {
     const notifications = await Notification.find().sort({ createdAt: -1 });
-    res.status(200).json(notifications);
+    res.status(200).json({
+      statusCode: 200,
+      notifications,
+    });
   } catch (err) {
     res.status(500).json(err);
   }
