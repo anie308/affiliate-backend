@@ -42,7 +42,7 @@ const withdrawFunds = async (req, res) => {
 
       const currentHour = today.getHours();
       console.log("Current Hour:", currentHour);
-      if (currentHour < 17 || currentHour >= 20) {
+      if (currentHour < 17 || currentHour >= 18) {
         return res.status(201).json({
           statusCode: 400,
           message: "Withdrawal Portal Closed",
@@ -80,20 +80,14 @@ const withdrawFunds = async (req, res) => {
       }
 
       console.log(currentHour);
-      if (currentHour < 17 || currentHour >= 18) {
+      if (currentHour < 17 || currentHour >= 20) {
         return res.status(201).json({
           statusCode: 400,
           message: "Withdrawal Portal Closed",
         });
       }
 
-      if ((dayOfWeek !== 1 && dayOfWeek !== 5) || (currentHour < 17 || currentHour >= 18)) {
-        // Withdrawals are only allowed on Mondays and Fridays between 5pm and 6pm
-        return res.status(201).json({
-          statusCode: 400,
-          message: "Withdrawals for 'affiliate' category are only allowed between 5pm and 6pm on Mondays and Fridays",
-        });
-      }
+      
 
       if (amount < 6000) {
         return res.status(201).json({
