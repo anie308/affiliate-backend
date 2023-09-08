@@ -42,7 +42,7 @@ const createTrend = async (req, res) => {
 
 const updateTrend = async (req, res) => {
   const { trendId } = req.params; // Assuming the trend ID is passed in the URL params
-  const { title, content, taskText } = req.body;
+  const { title, content, taskText, slug } = req.body;
 
   try {
     const existingTrend = await Trend.findById(trendId);
@@ -157,7 +157,7 @@ const completeTrend = async (req, res) => {
     }
     if (user.hasDoneTaskForToday) {
       return res.status(400).json({
-        statusCode: 200,
+        statusCode: 400,
         message: "You have already completed a task today",
       });
     }
