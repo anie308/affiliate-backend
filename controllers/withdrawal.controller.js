@@ -40,15 +40,14 @@ const withdrawFunds = async (req, res) => {
         });
       }
 
-
-      // const currentHour = today.getHours();
-      // console.log('Current Hour:', currentHour);
-      // if (currentHour < 17 || currentHour >= 18) {
-      //   return res.status(201).json({
-      //     statusCode: 400,
-      //     message: "Withdrawal Portal Closed",
-      //   });
-      // }
+      const currentHour = today.getHours();
+      console.log("Current Hour:", currentHour);
+      if (currentHour < 17 || currentHour >= 18) {
+        return res.status(201).json({
+          statusCode: 400,
+          message: "Withdrawal Portal Closed",
+        });
+      }
 
       if (parseInt(amount) < 16000) {
         return res.status(201).json({
@@ -56,8 +55,6 @@ const withdrawFunds = async (req, res) => {
           message: "Minimum withdrawal amount for 'activity' category is 16000",
         });
       }
-
-      
 
       if (activitybalance < parseInt(amount)) {
         return res.status(201).json({
@@ -70,6 +67,8 @@ const withdrawFunds = async (req, res) => {
     } else if (category === "affiliate") {
       const today = new Date();
       const dayOfWeek = today.getDay();
+            const currentHour = today.getHours();
+
 
       if (dayOfWeek !== 1 && dayOfWeek !== 5) {
         // 1 represents Monday, 5 represents Friday
@@ -80,13 +79,21 @@ const withdrawFunds = async (req, res) => {
         });
       }
 
-      // const currentHour = today.getHours();
-      // if (currentHour < 17 || currentHour >= 18) {
-      //   return res.status(201).json({
-      //     statusCode: 400,
-      //     message: "Withdrawal Portal Closed",
-      //   });
-      // }
+      console.log(currentHour);
+      if (currentHour < 17 || currentHour >= 18) {
+        return res.status(201).json({
+          statusCode: 400,
+          message: "Withdrawal Portal Closed",
+        });
+      }
+
+      if ((dayOfWeek !== 1 && dayOfWeek !== 5) || (currentHour < 17 || currentHour >= 18)) {
+        // Withdrawals are only allowed on Mondays and Fridays between 5pm and 6pm
+        return res.status(201).json({
+          statusCode: 400,
+          message: "Withdrawals for 'affiliate' category are only allowed between 5pm and 6pm on Mondays and Fridays",
+        });
+      }
 
       if (amount < 6000) {
         return res.status(201).json({
