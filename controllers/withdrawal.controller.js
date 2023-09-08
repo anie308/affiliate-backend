@@ -42,7 +42,7 @@ const withdrawFunds = async (req, res) => {
 
       const currentHour = today.getHours();
       console.log("Current Hour:", currentHour);
-      if (currentHour < 17 || currentHour >= 18) {
+      if (currentHour < 17 || currentHour >= 20) {
         return res.status(201).json({
           statusCode: 400,
           message: "Withdrawal Portal Closed",
