@@ -24,7 +24,7 @@ const createUser = async (req, res) => {
         .status(400)
         .json({ error: "Coupon code has already been used" });
 
-    const referralCode = username+uuidv4().substr(0, 3);
+    const referralCode = username+uuidv4().substr(0, 4);
     const referralLink = `https://lidenty.com/signup?ref=${referralCode}`;
     const newUser = new User({
       fullname,

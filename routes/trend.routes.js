@@ -9,10 +9,12 @@ const {
   completeTrend
 } = require("../controllers/trend.controller");
 const { verifyTokenAndAuthorization, verifyToken } = require("../middlewares/verifyPerson");
+const { validateFields } = require("../middlewares/validateFields");
 
 router.post(
   "/create",
   multer.single("thumbnail"),
+  validateFields(["title", "slug", "content", "taskText"]),
   verifyTokenAndAuthorization,
   createTrend
 );
