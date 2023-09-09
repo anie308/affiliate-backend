@@ -381,5 +381,5 @@ module.exports = {
   updateUser,
   dashStats,
   getTopEarners,
-  calculateTopEarner
+  // calculateTopEarner
 };
