@@ -37,7 +37,7 @@ router.post("/signin", validateFields(["email", "password"]), loginUser);
 
 router.get("/referrals/:userId", verifyToken, getReferrals);
 
-router.get("/earners/all",  calculateTopEarner);
+router.get("/earners/all",  getTopEarners);
 
 router.get("/users", verifyTokenAndAuthorization, getUsers);
 

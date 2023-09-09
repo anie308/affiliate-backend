@@ -328,46 +328,46 @@ const getTopEarners = async (req, res) => {
   }
 };
 
-const calculateTopEarner = async (req, res) => {
-  try {
-    // Assuming you have a database model named 'User' that represents your users
-    const users = await User.find({}).exec();
+// const calculateTopEarner = async (req, res) => {
+//   try {
+//     // Assuming you have a database model named 'User' that represents your users
+//     const users = await User.find({}).exec();
 
-    const result = [];
+//     const result = [];
 
-    for (const user of users) {
-      // Assuming 'refCount' and 'indirectRefCount' are fields representing counts
-      const refCount = user.refCount;
-      const indirectRefCount = user.indirectRefCount;
+//     for (const user of users) {
+//       // Assuming 'refCount' and 'indirectRefCount' are fields representing counts
+//       const refCount = user.refCount;
+//       const indirectRefCount = user.indirectRefCount;
 
-      const multipliedRefCount = refCount * 300;
-      const multipliedIndirectRefCount = indirectRefCount * 300;
+//       const multipliedRefCount = refCount * 30o0;
+//       const multipliedIndirectRefCount = indirectRefCount * 300;
 
-      // Calculate the total earnings for this user
-      const totalEarnings = multipliedRefCount + multipliedIndirectRefCount;
+//       // Calculate the total earnings for this user
+//       const totalEarnings = multipliedRefCount + multipliedIndirectRefCount;
 
-      // Update the user's 'topBalance' field with the total earnings
-      user.topBalance = totalEarnings;
+//       // Update the user's 'topBalance' field with the total earnings
+//       user.topBalance = totalEarnings;
 
-      // Save the updated user back to the database
-      await user.save();
+//       // Save the updated user back to the database
+//       await user.save();
 
-      // Push the user and their total earnings to the result array
-      result.push({ username: user.username, totalEarnings });
-    }
+//       // Push the user and their total earnings to the result array
+//       result.push({ username: user.username, totalEarnings });
+//     }
 
-    // Sort the users by totalEarnings in descending order
-    result.sort((a, b) => b.totalEarnings - a.totalEarnings);
+//     // Sort the users by totalEarnings in descending order
+//     result.sort((a, b) => b.totalEarnings - a.totalEarnings);
 
-    // Limit the result to the top 10 earners
-    const top10Earners = result.slice(0, 10);
+//     // Limit the result to the top 10 earners
+//     const top10Earners = result.slice(0, 10);
 
-    res.status(200).json(top10Earners);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'An error occurred while calculating top earners.' });
-  }
-};
+//     res.status(200).json(top10Earners);
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ error: 'An error occurred while calculating top earners.' });
+//   }
+// };
 
 
 
