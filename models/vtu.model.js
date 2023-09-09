@@ -6,17 +6,29 @@ const vtuSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    type:{
+      type: String,
+      required: true,
+    },
     phonenumber: {
       type: String,
       required: true,
     },
-    phoneline: {
+    network: {
       type: String,
       required: true,
     },
-    dataplan: {
+    plan: {
       type: String,
-      required: true,
+    },
+    duration: {
+      type: String,
+    },
+    amount: {
+      type: String,
+    },
+    points: {
+      type: String,
     },
   },
   { timestamps: true }

@@ -13,6 +13,10 @@ const adminSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+    vtuPortalOpen: {
+      type: Boolean,
+      default: false,
+    },
 
     username: {
       type: String,
