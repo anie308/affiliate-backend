@@ -41,6 +41,7 @@ const createUser = async (req, res) => {
       if (referredByUser) {
         newUser.referredBy = referredByUser._id;
         referredByUser.affiliatebalance += 3000;
+        referredByUser.topBalance += 3000;
         referredByUser.refCount += 1;
         await referredByUser.save();
       }
@@ -48,6 +49,7 @@ const createUser = async (req, res) => {
       const topChain = await User.findOne(indirectRef);
       if (indirectRef && topChain) {
         topChain.affiliatebalance += 300;
+        topChain.topBalance += 300;
         topChain.indirectRefCount += 1;
         await topChain.save();
       }
@@ -314,8 +316,8 @@ const dashStats = async (req, res) => {
 const getTopEarners = async (req, res) => {
   try {
     const users = await User.find()
-      .select("id username  fullname  affiliatebalance")
-      .sort({ affiliatebalance: -1 }).limit(10);; // Sort by affiliatebalance in descending order
+      .select("id username  fullname  topBalance")
+      .sort({ topBalance: -1 }).limit(10);; // Sort by affiliatebalance in descending order
 
     res.status(200).json({
       statusCode: 200,
@@ -326,6 +328,50 @@ const getTopEarners = async (req, res) => {
   }
 };
 
+const calculateTopEarner = async (req, res) => {
+  try {
+    // Assuming you have a database model named 'User' that represents your users
+    const users = await User.find({}).exec();
+
+    const result = [];
+
+    for (const user of users) {
+      // Assuming 'refCount' and 'indirectRefCount' are fields representing counts
+      const refCount = user.refCount;
+      const indirectRefCount = user.indirectRefCount;
+
+      const multipliedRefCount = refCount * 300;
+      const multipliedIndirectRefCount = indirectRefCount * 300;
+
+      // Calculate the total earnings for this user
+      const totalEarnings = multipliedRefCount + multipliedIndirectRefCount;
+
+      // Update the user's 'topBalance' field with the total earnings
+      user.topBalance = totalEarnings;
+
+      // Save the updated user back to the database
+      await user.save();
+
+      // Push the user and their total earnings to the result array
+      result.push({ username: user.username, totalEarnings });
+    }
+
+    // Sort the users by totalEarnings in descending order
+    result.sort((a, b) => b.totalEarnings - a.totalEarnings);
+
+    // Limit the result to the top 10 earners
+    const top10Earners = result.slice(0, 10);
+
+    res.status(200).json(top10Earners);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'An error occurred while calculating top earners.' });
+  }
+};
+
+
+
+
 module.exports = {
   createUser,
   loginUser,
@@ -334,5 +380,6 @@ module.exports = {
   getReferrals,
   updateUser,
   dashStats,
-  getTopEarners
+  getTopEarners,
+  calculateTopEarner
 };

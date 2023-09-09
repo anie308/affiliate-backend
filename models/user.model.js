@@ -54,6 +54,10 @@ const userSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    topBalance: {
+      type: Number,
+      default: 0,
+    },
 
     referredBy: {
       type: mongoose.Schema.Types.ObjectId,
