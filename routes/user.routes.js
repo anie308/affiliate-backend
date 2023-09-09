@@ -7,6 +7,7 @@ const {
   updateUser,
   dashStats,
   getTopEarners,
+  // calculateTopEarner,
 } = require("../controllers/user.controllers");
 const {
   verifyToken,
@@ -37,6 +38,7 @@ router.post("/signin", validateFields(["email", "password"]), loginUser);
 router.get("/referrals/:userId", verifyToken, getReferrals);
 
 router.get("/earners/all",  getTopEarners);
+// router.get("/earners/calc",  calculateTopEarner);
 
 router.get("/users", verifyTokenAndAuthorization, getUsers);
 
