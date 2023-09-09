@@ -7,7 +7,6 @@ const {
   updateUser,
   dashStats,
   getTopEarners,
-  calculateTopEarner
 } = require("../controllers/user.controllers");
 const {
   verifyToken,
