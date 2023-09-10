@@ -117,8 +117,39 @@ const updateVtuStatus = async (req, res) => {
   }
 };
 
+const openPortal = async (req, res) => {
+  const { value} = req.body;
+  try {
+    const admin = await Admin.findOne({});
+    admin.vtuPortalOpen = value;
+    await admin.save();
+    res.status(200).json({
+      message: "VTU Portal Opened Successfully",
+      statusCode: 200,
+    });
+  } catch (err) {
+    res.status(500).json(err);
+  }
+}
+const closePortal = async (req, res) => {
+  const { value} = req.body;
+  try {
+    const admin = await Admin.findOne({});
+    admin.vtuPortalOpen = value;
+    await admin.save();
+    res.status(200).json({
+      message: "VTU Portal Closed Successfully",
+      statusCode: 200,
+    });
+  } catch (err) {
+    res.status(500).json(err);
+  }
+}
+
 module.exports = {
   createVtu,
   getVtu,
-  updateVtuStatus
+  updateVtuStatus,
+  openPortal,
+  closePortal
 };

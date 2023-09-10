@@ -69,7 +69,16 @@ const loginAdmin = async (req, res) => {
   }
 };
 
+const getAdmin = async (req, res) => {
+  const admin = await Admin.findOne({});
+  res.status(200).json({
+    statusCode: 200,
+    admin
+  });
+}
+
 module.exports = {
   createAdmin,
   loginAdmin,
+  getAdmin
 };
