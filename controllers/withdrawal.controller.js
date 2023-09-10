@@ -159,7 +159,6 @@ const updateWithdrawalStatus = async (req, res) => {
   const { withdrawalId } = req.params;
   const { status } = req.body;
 
-  console.log(withdrawalId, status);
   try {
     const withdrawRequest = await WithdrawRequest.findById(withdrawalId);
     if (!withdrawRequest) {

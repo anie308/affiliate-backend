@@ -7,6 +7,8 @@ const {
   updateUser,
   dashStats,
   getTopEarners,
+  forgotPassword,
+  resetPassword
   // calculateTopEarner,
 } = require("../controllers/user.controllers");
 const {
@@ -29,6 +31,9 @@ router.post(
   ]),
   createUser
 );
+
+router.post("/forgotpassword", validateFields(["email"]), forgotPassword);
+router.post("/resetpassword", validateFields(["email", "code", "password"]), resetPassword);
 router.get("/:userId",  getUser);
 router.get("/stats/:userId",  dashStats);
 router.put("/:userId", verifyToken,  updateUser);

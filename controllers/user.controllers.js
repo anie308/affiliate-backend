@@ -2,9 +2,15 @@ const cryptoJs = require("crypto-js");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user.model");
 const Coupon = require("../models/coupon.model");
+const Code = require("../models/resetCodes.model");
 const Withdrawal = require("../models/withdrawalRequest.model");
-
+const brevo = require("@getbrevo/brevo");
+const client = brevo.ApiClient.instance;
+const apiKey = client.authentications["api-key"];
+apiKey.apiKey = process.env.SIB_KEY;
 const { v4: uuidv4 } = require("uuid");
+
+const tranEmailApi = new brevo.TransactionalEmailsApi();
 
 const createUser = async (req, res) => {
   const { fullname, email, password, couponcode, username, phonenumber, ref } =
@@ -129,6 +135,63 @@ const updateUser = async (req, res) => {
     res.status(500).json(err);
   }
 };
+
+const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+
+  const user = await User.findOne({ email });
+  if(!user) return res.status(404).json({message:" User Doesnt Exist"})
+  const code = uuidv4().substr(0, 6);
+
+  const sender = {
+    email: process.env.EMAIL,
+  };
+
+  const receiver = [
+    {
+      email: email,
+    },
+  ];
+
+  const newCode = new Code({
+    code
+  })
+
+  tranEmailApi
+  .sendTransacEmail({
+    sender,
+    to: receiver,
+    subject: "Forgot Password",
+    htmlContent: `<div>Hi ${user.fullname} use this code to reset your password <b>${code}</b>. If you did not initiate this ignore this mail </div>`,
+  }).then(()=> {
+     newCode.save();
+     res.status(200).json({
+      statusCode: 200,
+      message: 'OTP has been sent to your email'
+    })
+  })
+  .catch((err) => {
+    res.status(500).json(err);
+  });
+}
+
+const resetPassword = async (req, res) => {
+  const { email, code, password } = req.body;
+  const usercode = Code.findOne({code});
+  if(!usercode) return res.status(404).json({message: 'Invalid code'})
+  const user = await User.findOne({email});
+  if(!user) return res.status(404).json({message: 'User not found'})
+
+  user.password = cryptoJs.AES.encrypt(password, process.env.PASS_SEC)
+  await user.save();
+
+  res.status(200).json({
+    statusCode: 200,
+    message: 'Password reset successful'
+  })
+
+}
+
 
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
@@ -381,5 +444,7 @@ module.exports = {
   updateUser,
   dashStats,
   getTopEarners,
-  calculateTopEarner
+  calculateTopEarner,
+  forgotPassword,
+  resetPassword
 };
