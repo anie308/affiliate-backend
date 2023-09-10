@@ -76,7 +76,49 @@ const getVtu = async (req, res) => {
   }
 };
 
+const updateVtuStatus = async (req, res) => {
+  const { vtuId } = req.params;
+  const { status } = req.body;
+
+  try {
+    const vtuRequest = await Vtu.findById(vtuId);
+    if (!vtuRequest) {
+      return res.status(404).json({ message: "Vtu request not found" });
+    }
+
+    // Update withdrawal status
+    vtuRequest.status = status;
+    await vtuRequest.save();
+
+    if (status === "approved") {
+      // If the status is success, no further action needed
+      return res.status(200).json({
+        statusCode: 200,
+        message: "Top Up Success!",
+      });
+    } else if (status === "declined") {
+      // Refund money to the user's balance and update user document
+      const user = await User.findById(vtuRequest.userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      user.activitybalance += vtuRequest.amount;
+
+      await user.save();
+
+      return res.status(200).json({
+        statusCode: 200,
+        message: "Top Up declined!",
+      });
+    }
+  } catch (err) {
+    res.status(500).json(err);
+  }
+};
+
 module.exports = {
   createVtu,
   getVtu,
+  updateVtuStatus
 };

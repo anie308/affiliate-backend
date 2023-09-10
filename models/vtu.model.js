@@ -30,6 +30,11 @@ const vtuSchema = new mongoose.Schema(
     points: {
       type: String,
     },
+    status:{
+      type: String,
+      default: "pending",
+      enum: ["pending", "approved", "declined"],
+    }
   },
   { timestamps: true }
 );
