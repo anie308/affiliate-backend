@@ -5,10 +5,10 @@ const { isValidObjectId } = require("mongoose");
 
 const withdrawFunds = async (req, res) => {
   const { amount, category, userId } = req.body;
-  const admin = await Admin.findOne({});
 
   try {
     const user = await User.findById(userId);
+    const admin = await Admin.findOne({});
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -51,6 +51,26 @@ const withdrawFunds = async (req, res) => {
           });
         } else {
           user.activitybalance -= parseInt(amount);
+          await user.save();
+          const withdrawRequest = new WithdrawRequest({
+            userId: id,
+            amount,
+            category,
+            bankname,
+            accountnumber,
+            accountname,
+            fullname,
+          });
+          await withdrawRequest.save();
+          res.status(201).json({
+            statusCode: 201,
+            message: "Withdrawal request sent successfully",
+            data: {
+              amount: withdrawRequest.amount,
+              category: withdrawRequest.category,
+              status: withdrawRequest.status, // Assuming status is a field in WithdrawRequest schema
+            },
+          });
         }
       }
     } else if (category === "affiliate") {
@@ -75,29 +95,28 @@ const withdrawFunds = async (req, res) => {
           });
         }
         user.affiliatebalance -= parseInt(amount);
+        await user.save();
+        const withdrawRequest = new WithdrawRequest({
+          userId: id,
+          amount,
+          category,
+          bankname,
+          accountnumber,
+          accountname,
+          fullname,
+        });
+        await withdrawRequest.save();
+        res.status(201).json({
+          statusCode: 201,
+          message: "Withdrawal request sent successfully",
+          data: {
+            amount: withdrawRequest.amount,
+            category: withdrawRequest.category,
+            status: withdrawRequest.status, // Assuming status is a field in WithdrawRequest schema
+          },
+        });
       }
     }
-
-    await user.save();
-    const withdrawRequest = new WithdrawRequest({
-      userId: id,
-      amount,
-      category,
-      bankname,
-      accountnumber,
-      accountname,
-      fullname,
-    });
-    await withdrawRequest.save();
-    res.status(201).json({
-      statusCode: 201,
-      message: "Withdrawal request sent successfully",
-      data: {
-        amount: withdrawRequest.amount,
-        category: withdrawRequest.category,
-        status: withdrawRequest.status, // Assuming status is a field in WithdrawRequest schema
-      },
-    });
   } catch (err) {
     res.status(500).json(err);
   }

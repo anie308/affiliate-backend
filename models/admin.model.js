@@ -17,6 +17,10 @@ const adminSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    withdrawPortal: {
+      type: Boolean,
+      default: false,
+    },
 
     username: {
       type: String,
