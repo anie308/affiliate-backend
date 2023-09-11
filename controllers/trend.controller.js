@@ -21,7 +21,6 @@ const createTrend = async (req, res) => {
     });
 
     if (file) {
-      console.log(file);
       const { secure_url: url, public_id } = await cloudinary.uploader.upload(
         file.path
       );
@@ -91,7 +90,6 @@ const deleteTrend = async (req, res) => {
 
     if (public_id) {
       const { result } = await cloudinary.uploader.destroy(public_id);
-      console.log(result);
       if (result !== "ok")
         return res.status(404).json({ error: "Could not remove thumbnail!" });
     }
@@ -138,7 +136,6 @@ const getTrends = async (req, res) => {
 
 const completeTrend = async (req, res) => {
   const { userId, trendId } = req.body;
-  console.log(userId, trendId)
 
   try {
     const trend = await Trend.findById(trendId);

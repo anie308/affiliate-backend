@@ -113,18 +113,6 @@ const updateUser = async (req, res) => {
       user.bankname = updateData.bankname;
     }
 
-    // if (file) {
-    //   console.log(file);
-    //   const { secure_url: url, public_id } = await cloudinary.uploader.upload(
-    //     file.path
-    //   );
-    //   user.profileImage = { url, public_id };
-    //   // newLesson.lessons.lesson_video = { url, public_id };
-    // }
-
-    // You can add additional fields to update here if needed
-
-    // Save the updated user data
     await user.save();
 
     res.status(200).json({
