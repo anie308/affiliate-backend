@@ -5,6 +5,7 @@ const { isValidObjectId } = require("mongoose");
 
 const withdrawFunds = async (req, res) => {
   const { amount, category, userId } = req.body;
+  const admin = await Admin.findOne({});
 
   try {
     const user = await User.findById(userId);
@@ -29,80 +30,52 @@ const withdrawFunds = async (req, res) => {
     }
 
     if (category === "activity") {
-      const today = new Date();
-      const dayOfMonth = today.getDate();
-
-      if (dayOfMonth !== 20) {
-        return res.status(201).json({
+      if (admin.withdrawPortal === false) {
+        return res.status(400).json({
+          message: "Withdrawal Portal is currently closed",
           statusCode: 400,
-          message:
-            "Withdrawals are only allowed on the 20th day of the month for the 'activity' category",
-        });
-      }
-
-      const currentHour = today.getHours();
-      console.log("Current Hour:", currentHour);
-      if (currentHour < 17 || currentHour >= 18) {
-        return res.status(201).json({
-          statusCode: 400,
-          message: "Withdrawal Portal Closed",
-        });
-      }
-
-      if (parseInt(amount) < 16000) {
-        return res.status(201).json({
-          statusCode: 400,
-          message: "Minimum withdrawal amount for 'activity' category is 16000",
-        });
-      }
-
-      if (activitybalance < parseInt(amount)) {
-        return res.status(201).json({
-          statusCode: 400,
-          message: "Insufficient funds",
         });
       } else {
-        user.activitybalance -= parseInt(amount);
+        if (parseInt(amount) < 16000) {
+          return res.status(201).json({
+            statusCode: 400,
+            message:
+              "Minimum withdrawal amount for 'activity' category is 16000",
+          });
+        }
+
+        if (activitybalance < parseInt(amount)) {
+          return res.status(201).json({
+            statusCode: 400,
+            message: "Insufficient funds",
+          });
+        } else {
+          user.activitybalance -= parseInt(amount);
+        }
       }
     } else if (category === "affiliate") {
-      const today = new Date();
-      const dayOfWeek = today.getDay();
-            const currentHour = today.getHours();
-
-
-      if (dayOfWeek !== 1 && dayOfWeek !== 5) {
-        // 1 represents Monday, 5 represents Friday
-        return res.status(201).json({
+      if (admin.withdrawPortal === false) {
+        return res.status(400).json({
+          message: "Withdrawal Portal is currently closed",
           statusCode: 400,
-          message:
-            "Withdrawals are only allowed on Mondays and Fridays of the week for the 'affiliate' category",
         });
-      }
+      } else {
+        if (amount < 6000) {
+          return res.status(201).json({
+            statusCode: 400,
+            message:
+              "Minimum withdrawal amount for 'affiliate' category is 6000",
+          });
+        }
 
-      console.log(currentHour);
-      if (currentHour < 17 || currentHour >= 18) {
-        return res.status(201).json({
-          statusCode: 400,
-          message: "Withdrawal Portal Closed",
-        });
+        if (affiliatebalance < amount) {
+          return res.status(201).json({
+            statusCode: 400,
+            message: "Insufficient funds",
+          });
+        }
+        user.affiliatebalance -= parseInt(amount);
       }
-
-      
-
-      if (amount < 6000) {
-        return res.status(201).json({
-          statusCode: 400,
-          message: "Minimum withdrawal amount for 'affiliate' category is 6000",
-        });
-      }
-
-      if (affiliatebalance < amount) {
-        return res.status(201).json({
-          statusCode: 400,
-          message: "Insufficient funds",
-        });
-      }
-      user.affiliatebalance -= parseInt(amount);
     }
 
     await user.save();
