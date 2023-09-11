@@ -21,7 +21,6 @@ const checkCodeValidity = async (req, res, next) => {
       req.coupon = existingCoupon; // Attach the coupon to the request
       next(); // Move on to the next middleware or route handler
     } catch (err) {
-      console.log("error", err);
       res.status(500).json({
         error: "An error occurred while checking the code.",
       });

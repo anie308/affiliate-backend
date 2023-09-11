@@ -47,7 +47,6 @@ const createVtu = async (req, res) => {
         user.activitybalance = user.activitybalance -= parseFloat(amount);
       }
 
-      console.log(points);
 
       await user.save();
 
@@ -60,7 +59,6 @@ const createVtu = async (req, res) => {
     });
   } catch (err) {
     res.status(500).json(err);
-    console.log(err);
   }
 };
 
