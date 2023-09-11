@@ -4,7 +4,7 @@ const {
     verifyTokenAndAuthorization,
   } = require("../middlewares/verifyPerson");
 
-const { withdrawFunds, updateWithdrawalStatus, getAllWithdrawals, getUserWithdrawals } = require('../controllers/withdrawal.controller')
+const { withdrawFunds, updateWithdrawalStatus, getAllWithdrawals, getUserWithdrawals, openPortal, closePortal } = require('../controllers/withdrawal.controller')
 
 
 router.post(
@@ -22,6 +22,9 @@ router.post(
     verifyTokenAndAuthorization,
     updateWithdrawalStatus
   );
+
+  router.post('/portal', verifyTokenAndAuthorization, openPortal);
+router.post('/portal/close', verifyTokenAndAuthorization, closePortal);
 
 
 module.exports = router;

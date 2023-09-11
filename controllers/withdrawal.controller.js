@@ -192,9 +192,40 @@ const updateWithdrawalStatus = async (req, res) => {
   }
 };
 
+const openPortal = async (req, res) => {
+  const { value} = req.body;
+  try {
+    const admin = await Admin.findOne({});
+    admin.withdrawPortal = value;
+    await admin.save();
+    res.status(200).json({
+      message: "VTU Portal Opened Successfully",
+      statusCode: 200,
+    });
+  } catch (err) {
+    res.status(500).json(err);
+  }
+}
+const closePortal = async (req, res) => {
+  const { value} = req.body;
+  try {
+    const admin = await Admin.findOne({});
+    admin.withdrawPortal = value;
+    await admin.save();
+    res.status(200).json({
+      message: "VTU Portal Closed Successfully",
+      statusCode: 200,
+    });
+  } catch (err) {
+    res.status(500).json(err);
+  }
+}
+
 module.exports = {
   withdrawFunds,
   updateWithdrawalStatus,
   getAllWithdrawals,
   getUserWithdrawals,
+  closePortal,
+  openPortal
 };
