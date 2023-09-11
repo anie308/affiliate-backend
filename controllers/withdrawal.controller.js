@@ -199,7 +199,7 @@ const openPortal = async (req, res) => {
     admin.withdrawPortal = value;
     await admin.save();
     res.status(200).json({
-      message: "VTU Portal Opened Successfully",
+      message: "Withdrawal Portal Opened Successfully",
       statusCode: 200,
     });
   } catch (err) {
@@ -213,7 +213,7 @@ const closePortal = async (req, res) => {
     admin.withdrawPortal = value;
     await admin.save();
     res.status(200).json({
-      message: "VTU Portal Closed Successfully",
+      message: "Withdrawal Portal Closed Successfully",
       statusCode: 200,
     });
   } catch (err) {
