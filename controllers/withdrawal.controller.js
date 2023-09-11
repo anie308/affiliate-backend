@@ -31,6 +31,15 @@ const withdrawFunds = async (req, res) => {
 
     if (category === "activity") {
       if (admin.withdrawPortal === false) {
+        const currentDate = new Date();
+
+        if (currentDate.getDate() !== 20) {
+          return res.status(400).json({
+            message:
+              "Withdrawals can only be made on the 20th of every month for 'activity' category",
+            statusCode: 400,
+          });
+        }
         return res.status(400).json({
           message: "Withdrawal Portal is currently closed",
           statusCode: 400,
@@ -74,6 +83,16 @@ const withdrawFunds = async (req, res) => {
         }
       }
     } else if (category === "affiliate") {
+      const currentDate = new Date();
+
+      // Check if it's Monday (day of the week = 1) or Friday (day of the week = 5)
+      if (currentDate.getDay() !== 1 || currentDate.getDay() !== 5) {
+        return res.status(400).json({
+          message:
+            "Withdrawals can only be made on Mondays and Fridays for 'affiliate' category",
+          statusCode: 400,
+        });
+      }
       if (admin.withdrawPortal === false) {
         return res.status(400).json({
           message: "Withdrawal Portal is currently closed",
@@ -193,7 +212,7 @@ const updateWithdrawalStatus = async (req, res) => {
 };
 
 const openPortal = async (req, res) => {
-  const { value} = req.body;
+  const { value } = req.body;
   try {
     const admin = await Admin.findOne({});
     admin.withdrawPortal = value;
@@ -205,9 +224,9 @@ const openPortal = async (req, res) => {
   } catch (err) {
     res.status(500).json(err);
   }
-}
+};
 const closePortal = async (req, res) => {
-  const { value} = req.body;
+  const { value } = req.body;
   try {
     const admin = await Admin.findOne({});
     admin.withdrawPortal = value;
@@ -219,7 +238,7 @@ const closePortal = async (req, res) => {
   } catch (err) {
     res.status(500).json(err);
   }
-}
+};
 
 module.exports = {
   withdrawFunds,
@@ -227,5 +246,5 @@ module.exports = {
   getAllWithdrawals,
   getUserWithdrawals,
   closePortal,
-  openPortal
+  openPortal,
 };
